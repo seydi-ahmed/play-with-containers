@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # Database Services
+  inventory-db:
+    image: postgres:15-alpine
+    container_name: inventory-db
+    environment:
+      POSTGRES_USER: ${INVENTORY_DB_USER}
+      POSTGRES_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      POSTGRES_DB: ${INVENTORY_DB_NAME}
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  billing-db:
+    image: postgres:15-alpine
+    container_name: billing-db
+    environment:
+      POSTGRES_USER: ${BILLING_DB_USER}
+      POSTGRES_PASSWORD: ${BILLING_DB_PASSWORD}
+      POSTGRES_DB: ${BILLING_DB_NAME}
+    volumes:
+      - billing-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"  # Different external port to avoid conflict
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # RabbitMQ Service
+  rabbit-queue:
+    image: rabbitmq:3.12-alpine
+    container_name: rabbit-queue
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+    networks:
+      - backend
+    restart: unless-stopped
+
+  # Application Services
+  inventory-app:
+    build:
+      context: ./srcs/inventory-app
+      dockerfile: Dockerfile
+    container_name: inventory-app
+    environment:
+      DB_HOST: inventory-db
+      DB_PORT: 5432
+      DB_USER: ${INVENTORY_DB_USER}
+      DB_PASSWORD: ${INVENTORY_DB_PASSWORD}
+      DB_NAME: ${INVENTORY_DB_NAME}
+      RABBITMQ_HOST: rabbit-queue
+    ports:
+      - "${INVENTORY_APP_PORT}:8000"
+    depends_on:
+      - inventory-db
+      - rabbit-queue
+    networks:
+      - backend
+    restart: unless-stopped
+
+  billing-app:
+    build:
+      context: ./srcs/billing-app
+      dockerfile: Dockerfile
+    container_name: billing-app
+    environment:
+      DB_HOST: billing-db
+      DB_PORT: 5432
+      DB_USER: ${BILLING_DB_USER}
+      DB_PASSWORD: ${BILLING_DB_PASSWORD}
+      DB_NAME: ${BILLING_DB_NAME}
+      RABBITMQ_HOST: rabbit-queue
+      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE}
+    ports:
+      - "8081:8080"  # Different port to avoid conflict
+    depends_on:
+      - billing-db
+      - rabbit-queue
+    networks:
+      - backend
+    restart: unless-stopped
+
+  api-gateway-app:
+    build:
+      context: ./srcs/api-gateway-app
+      dockerfile: Dockerfile
+    container_name: api-gateway-app
+    environment:
+      INVENTORY_SERVICE_URL: http://inventory-app:8000
+      BILLING_SERVICE_URL: http://billing-app:8080
+      RABBITMQ_HOST: rabbit-queue
+    ports:
+      - "${APIGATEWAY_PORT}:3000"
+    volumes:
+      - api-gateway-logs:/var/log/api-gateway
+    depends_on:
+      - inventory-app
+      - billing-app
+    networks:
+      - backend
+    restart: unless-stopped
+
+# Networks
+networks:
+  backend:
+    driver: bridge
+
+# Volumes
+volumes:
+  inventory-db-data:
+  billing-db-data:
+  api-gateway-logs:
