@@ -1,125 +1,168 @@
-# 📌 CRUD-Master
+# play-with-containers
 
-## 📂 Description
-CRUD-Master est un projet de microservices qui gère les commandes et l'inventaire d'un service de streaming. Il repose sur un système d'API Gateway, un service d'inventaire et un service de facturation, orchestrés via RabbitMQ et gérés par PM2.
+## Description
 
-## 🛠 Technologies Utilisées
-- **Langages & Frameworks :**
-  - JavaScript (Node.js, Express)
-  - Shell Script (sh)
-- **Outils & Systèmes :**
-  - Vagrant (gestion des machines virtuelles)
-  - PM2 (gestion des processus Node.js)
-  - RabbitMQ (message broker)
-  - PostgreSQL (base de données)
-  - Postman (test des APIs)
-  - VSCode (environnement de développement)
+**play-with-containers** est un projet Dockerisé qui utilise plusieurs services (API Gateway, Inventory, Billing) pour simuler une application full-stack avec une gestion des requêtes via RabbitMQ et un proxy avec Nginx. Ce projet est conçu pour gérer les informations de facturation et d'inventaire tout en testant l'architecture des containers Docker.
+
+Ce projet remplace les VM initialement gérées avec Vagrant par des containers Docker, offrant ainsi une gestion plus simple et plus rapide des différents services.
+
+## Auteur
+
+- **Nom** : Mouhamed DIOUF
+- **GitHub** : [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf)
+- **Email** : seydiahmedelcheikh@gmail.com
 
 ---
 
-## 🚀 Installation et Déploiement
+## Prérequis
 
-### 📌 1. Lancer l'environnement Vagrant
-1. Ouvrir un terminal et naviguer à la racine du projet.
-2. Exécuter la commande :
-   ```bash
-   vagrant up
-   ```
+Assurez-vous que vous avez installé Docker et Docker Compose sur votre machine. Si vous ne les avez pas installés, suivez les instructions sur leurs sites officiels :
 
-### 📌 2. Démarrer les services dans des machines virtuelles
-Ouvrir **trois terminaux**, chacun exécutant un microservice distinct :
+- [Installer Docker](https://docs.docker.com/get-docker/)
+- [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
-#### Terminal 1 : API Gateway
-```bash
-vagrant ssh gateway-vm
-cd /vagrant/srcs/api-gateway
-pm2 start server.js --name "api-gateway" --watch
-```
+## Installation
 
-#### Terminal 2 : Inventory Service
-```bash
-vagrant ssh inventory-vm
-cd /vagrant/srcs/inventory-app
-pm2 start server.js --name "inventory-app" --watch
-```
+1. **Clonez le repository :**
 
-#### Terminal 3 : Billing Service
-```bash
-vagrant ssh billing-vm
-cd /vagrant/srcs/billing-app
-pm2 start server.js --name "billing-app" --watch
-```
+    ```bash
+    git clone https://learn.zone01dakar.sn/git/mouhameddiouf/play-with-containers.git
+    cd play-with-containers
+    ```
 
-### 📌 3. Tester les API avec Postman
-1. Ouvrir **Postman**
-2. Importer la collection : `MovieStreaming.postman_collection.json`
-3. Exécuter les requêtes et vérifier les réponses
+2. **Créez un fichier `.env` dans la racine du projet** en utilisant le modèle suivant :
 
----
+    ```bash
+    cp .env.sample .env
+    ```
 
-## 🔧 Commandes Utiles
+    Remplissez les variables du fichier `.env` avec les valeurs appropriées pour votre environnement.
 
-### 📌 Base de Données (PostgreSQL)
-| Commande | Description |
-|----------|------------|
-| `sudo -i -u postgres` | Passer en mode super-utilisateur PostgreSQL |
-| `psql` | Se connecter au serveur PostgreSQL |
-| `\l` | Lister toutes les bases de données |
-| `\c nom_de_la_base` | Se connecter à une base de données |
-| `\d` | Lister les tables de la base de données courante |
-| `\d nom_de_la_table` | Voir la structure d'une table |
-| `SELECT * FROM nom_de_la_table;` | Voir les entrées d'une table |
+3. **Lancez les containers avec Docker Compose :**
 
-### 📌 Gestion de RabbitMQ
-| Commande | Description |
-|----------|------------|
-| `sudo rabbitmqctl list_users` | Lister les utilisateurs RabbitMQ |
-| `sudo rabbitmqctl add_user user password` | Ajouter un utilisateur |
-| `sudo rabbitmqctl set_permissions -p / user ".*" ".*" ".*"` | Définir les permissions d'un utilisateur |
-| `sudo rabbitmqctl list_queues` | Lister les files d'attente |
-| `sudo rabbitmqctl list_connections` | Voir les connexions RabbitMQ actives |
-| `sudo systemctl restart rabbitmq-server` | Redémarrer RabbitMQ |
+    ```bash
+    docker-compose up -d
+    ```
 
-### 📌 Gestion des logs et services
-| Commande | Description |
-|----------|------------|
-| `tail -f /var/log/rabbitmq/rabbit@billing-vm.log` | Suivre les logs RabbitMQ |
-| `pm2 list` | Lister tous les processus gérés par PM2 |
-| `pm2 restart all` | Redémarrer tous les services |
-| `pm2 logs` | Voir les logs des services |
-| `systemctl status rabbitmq-server` | Vérifier l'état de RabbitMQ |
+    Cela va démarrer tous les services dans des containers Docker (API Gateway, Billing App, Inventory App, RabbitMQ, PostgreSQL).
+
+## Commandes Docker utiles
+
+- **Voir l'état des containers en cours d'exécution :**
+  
+    ```bash
+    docker ps
+    ```
+
+- **Afficher les logs d'un container :**
+
+    ```bash
+    docker logs -f <container_name>
+    ```
+
+- **Arrêter un container spécifique :**
+
+    ```bash
+    docker stop <container_name>
+    ```
+
+- **Démarrer un container spécifique :**
+
+    ```bash
+    docker start <container_name>
+    ```
+
+- **Redémarrer un container spécifique :**
+
+    ```bash
+    docker restart <container_name>
+    ```
+
+- **Arrêter tous les containers :**
+
+    ```bash
+    docker-compose down
+    ```
 
 ---
 
-## 🛠 Debugging et Health Checks
+## API Endpoints
 
-### 📌 Vérifier les connexions RabbitMQ
-```bash
-sudo rabbitmqctl list_connections
-```
-➡ Permet de voir quels services sont connectés à RabbitMQ.
+### 1. API Gateway
 
-### 📌 Tester l'API de Health Check
-```bash
-curl http://192.168.56.30:7070/health
-```
-➡ Permet de s'assurer que le service **billing** est bien en cours d'exécution.
+L'API Gateway expose plusieurs routes et fait office de reverse proxy pour les services d'inventaire et de facturation.
+
+- **GET /api/movies** : Récupère la liste des films dans l'inventaire.
+  
+    Exemple de requête avec Postman :
+    ```bash
+    GET http://localhost:3000/api/movies
+    ```
+
+- **POST /api/movies** : Ajoute un film à l'inventaire.
+
+    Exemple de requête avec Postman :
+    ```bash
+    POST http://localhost:3000/api/movies
+    {
+      "title": "Nouveau film",
+      "description": "Description du film"
+    }
+    ```
+
+- **POST /api/billing** : Crée une commande pour le système de facturation via RabbitMQ.
+
+    Exemple de requête avec Postman :
+    ```bash
+    POST http://localhost:3000/api/billing
+    {
+      "user_id": "20",
+      "number_of_items": "99",
+      "total_amount": "250"
+    }
+    ```
 
 ---
 
-## 👨‍💻 Développeurs
+## Architecture
 
-| Nom | Email | GitHub |
-|-----|-------|--------|
-| **Mouhamed Diouf** | [seydiahmedelcheikh@gmail.com](mailto:seydiahmedelcheikh@gmail.com) | [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf) |
-| **Abdou Balde** | [abddou.balde@sn.01talent.com](mailto:abddou.balde@sn.01talent.com) | [abdbalde](https://learn.zone01dakar.sn/git/abdbalde) |
+Le projet est constitué de plusieurs services interconnectés :
+
+1. **API Gateway** : Sert de point d'entrée pour les clients, proxy les requêtes vers les services appropriés.
+2. **Billing App** : Gère les factures et envoie les messages dans RabbitMQ pour traitement.
+3. **Inventory App** : Gère l'inventaire des films.
+4. **RabbitMQ** : File d'attente pour le traitement asynchrone des commandes.
+5. **PostgreSQL** : Base de données pour l'inventaire et la facturation.
 
 ---
 
-## 📝 Notes et Améliorations Futures
-- [ ] Ajouter des tests unitaires avec Jest
-- [ ] Mettre en place un système de monitoring
-- [ ] Automatiser le déploiement avec Ansible ou Docker
+## Tests
 
-📌 **Dernier mot :** Ce projet est en constante évolution ! N'hésitez pas à contribuer et proposer des améliorations. 🚀
+1. **Vérification du fonctionnement de l'inventaire** :  
+   Envoyez une requête GET à `http://localhost:3000/api/movies` pour vérifier la récupération des films.
+
+2. **Ajout d'un film** :  
+   Utilisez la requête POST à `http://localhost:3000/api/movies` pour ajouter un film à l'inventaire.
+
+3. **Création d'une commande de facturation** :  
+   Envoyez une requête POST à `http://localhost:3000/api/billing` pour créer une nouvelle commande de facturation.
+
+4. **Simulation d'un arrêt de service** :  
+   Testez la gestion des commandes même lorsque `billing-app` est arrêté. Vérifiez que la commande est mise en attente dans RabbitMQ.
+
+---
+
+## Dépannage
+
+Si vous rencontrez des problèmes avec l'une des étapes ci-dessus, voici quelques points à vérifier :
+
+- Assurez-vous que Docker et Docker Compose sont correctement installés.
+- Vérifiez que les variables d'environnement dans le fichier `.env` sont correctement configurées.
+- Consultez les logs des containers avec la commande `docker logs -f <container_name>` pour obtenir des informations de débogage.
+
+---
+
+## Licence
+
+Ce projet est sous **licence MIT**.
 
