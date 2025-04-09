@@ -1,13 +1,18 @@
-# play-with-containers/srcs/inventory-app/Dockerfile
+# Use the penultimate stable Alpine-based Node.js image (v18)
+FROM node:18-alpine
 
-FROM python:3.12-alpine
+# Set working directory
+WORKDIR /app
 
-WORKDIR /usr/src/
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
 
-COPY requirements.txt ./
-
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Copy the rest of the app
 COPY . .
 
-CMD ["python", "server.py"]
+# Expose the port
+EXPOSE 8080
+
+# Start the app
+CMD ["node", "server.js"]

@@ -1,13 +1,15 @@
-# play-with-containers/srcs/billing-app/Dockerfile
+# ./srcs/billing-app/Dockerfile
 
-FROM python:3.12-alpine
+FROM node:18-alpine
 
-WORKDIR /usr/src/
+WORKDIR /app
 
-COPY requirements.txt ./
+COPY package*.json ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN npm install
 
 COPY . .
 
-ENTRYPOINT ["python", "server.py"]
+EXPOSE 8080
+
+CMD ["npm", "start"]

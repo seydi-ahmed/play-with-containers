@@ -1,76 +1,125 @@
-# crud-master
+# 📌 CRUD-Master
 
-Check more information about this project
-[here](https://github.com/01-edu/public/blob/master/subjects/devops/crud-master/README.md).
+## 📂 Description
+CRUD-Master est un projet de microservices qui gère les commandes et l'inventaire d'un service de streaming. Il repose sur un système d'API Gateway, un service d'inventaire et un service de facturation, orchestrés via RabbitMQ et gérés par PM2.
 
-## Setup
+## 🛠 Technologies Utilisées
+- **Langages & Frameworks :**
+  - JavaScript (Node.js, Express)
+  - Shell Script (sh)
+- **Outils & Systèmes :**
+  - Vagrant (gestion des machines virtuelles)
+  - PM2 (gestion des processus Node.js)
+  - RabbitMQ (message broker)
+  - PostgreSQL (base de données)
+  - Postman (test des APIs)
+  - VSCode (environnement de développement)
 
-In order to be able to run this application you need to have the following
-programs installed on your machine:
+---
 
-- [Vagrant](https://developer.hashicorp.com/vagrant/docs/installation).
-- [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
+## 🚀 Installation et Déploiement
 
-To interact with the application, it is recommended to install the following
-programs, or any equivalent ones:
+### 📌 1. Lancer l'environnement Vagrant
+1. Ouvrir un terminal et naviguer à la racine du projet.
+2. Exécuter la commande :
+   ```bash
+   vagrant up
+   ```
 
-- [Postman](https://www.postman.com/downloads/), or any other tool to
-  programmatically test API endpoints.
-- [DBeaver](https://dbeaver.io/download/), or any other tool to interact and
-  visualize the content of a SQL database.
+### 📌 2. Démarrer les services dans des machines virtuelles
+Ouvrir **trois terminaux**, chacun exécutant un microservice distinct :
 
-To launch the application, follow the below instructions:
-
-- Create a `.env` file in the root of the project folder as the example
-  provided. You can simply `cp .env.example .env`
-- Install _vagrant-env_ plug in running: `vagrant plugin install vagrant-env`
-- Run the command `vagrant up` to create all the VMs - this might take a while
-  depending on the resources of your local machine.
-- Interact with the VM cluster using Postman, `curl` or any other tool of your
-  choice. It is possible to see the IP address of the API Gateway and the port
-  in the [`config.yaml`](./config.yaml) and [`.env`](./.env) files
-
-To check if everything is working as expected:
-
-- Check that all the VMs are running
-
-```console
-$ vagrant status
-Current machine states:
-
-BillingVM                 running (virtualbox)
-InventoryVM               running (virtualbox)
-GatewayVM                 running (virtualbox)
-
-This environment represents multiple VMs. The VMs are all listed
-above with their current state. For more information about a specific
-VM, run `vagrant status NAME`.
+#### Terminal 1 : API Gateway
+```bash
+vagrant ssh gateway-vm
+cd /vagrant/srcs/api-gateway
+pm2 start server.js --name "api-gateway" --watch
 ```
 
-(you should see the same message or a similar one)
-
-- Check that your API Gateway is able to receive HTTP requests. For example,
-  you should be able to replicate a similar workflow (IP address and port must
-  be the ones defined in your configuration):
-
-```console
-$ curl -X POST -H "Content-Type: application/json" \
-    -d '{"title": "movie", "description": "wonderful plot"}' \
-    192.168.56.30:3000/api/movies
-{"message":"movie movie inserted successfully"}
-$ curl -s 192.168.56.30:3000/api/movies | jq
-{
-  "movies": [
-    {
-      "description": "wonderful plot",
-      "id": 3,
-      "title": "movie"
-    }
-  ]
-}
-$ curl -X DELETE 192.168.56.30:3000/api/movies
-{"message":"all movies deleted successfully"}
-$ curl 192.168.56.30:3000/api/movies
-{"movies":[]}
-$
+#### Terminal 2 : Inventory Service
+```bash
+vagrant ssh inventory-vm
+cd /vagrant/srcs/inventory-app
+pm2 start server.js --name "inventory-app" --watch
 ```
+
+#### Terminal 3 : Billing Service
+```bash
+vagrant ssh billing-vm
+cd /vagrant/srcs/billing-app
+pm2 start server.js --name "billing-app" --watch
+```
+
+### 📌 3. Tester les API avec Postman
+1. Ouvrir **Postman**
+2. Importer la collection : `MovieStreaming.postman_collection.json`
+3. Exécuter les requêtes et vérifier les réponses
+
+---
+
+## 🔧 Commandes Utiles
+
+### 📌 Base de Données (PostgreSQL)
+| Commande | Description |
+|----------|------------|
+| `sudo -i -u postgres` | Passer en mode super-utilisateur PostgreSQL |
+| `psql` | Se connecter au serveur PostgreSQL |
+| `\l` | Lister toutes les bases de données |
+| `\c nom_de_la_base` | Se connecter à une base de données |
+| `\d` | Lister les tables de la base de données courante |
+| `\d nom_de_la_table` | Voir la structure d'une table |
+| `SELECT * FROM nom_de_la_table;` | Voir les entrées d'une table |
+
+### 📌 Gestion de RabbitMQ
+| Commande | Description |
+|----------|------------|
+| `sudo rabbitmqctl list_users` | Lister les utilisateurs RabbitMQ |
+| `sudo rabbitmqctl add_user user password` | Ajouter un utilisateur |
+| `sudo rabbitmqctl set_permissions -p / user ".*" ".*" ".*"` | Définir les permissions d'un utilisateur |
+| `sudo rabbitmqctl list_queues` | Lister les files d'attente |
+| `sudo rabbitmqctl list_connections` | Voir les connexions RabbitMQ actives |
+| `sudo systemctl restart rabbitmq-server` | Redémarrer RabbitMQ |
+
+### 📌 Gestion des logs et services
+| Commande | Description |
+|----------|------------|
+| `tail -f /var/log/rabbitmq/rabbit@billing-vm.log` | Suivre les logs RabbitMQ |
+| `pm2 list` | Lister tous les processus gérés par PM2 |
+| `pm2 restart all` | Redémarrer tous les services |
+| `pm2 logs` | Voir les logs des services |
+| `systemctl status rabbitmq-server` | Vérifier l'état de RabbitMQ |
+
+---
+
+## 🛠 Debugging et Health Checks
+
+### 📌 Vérifier les connexions RabbitMQ
+```bash
+sudo rabbitmqctl list_connections
+```
+➡ Permet de voir quels services sont connectés à RabbitMQ.
+
+### 📌 Tester l'API de Health Check
+```bash
+curl http://192.168.56.30:7070/health
+```
+➡ Permet de s'assurer que le service **billing** est bien en cours d'exécution.
+
+---
+
+## 👨‍💻 Développeurs
+
+| Nom | Email | GitHub |
+|-----|-------|--------|
+| **Mouhamed Diouf** | [seydiahmedelcheikh@gmail.com](mailto:seydiahmedelcheikh@gmail.com) | [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf) |
+| **Abdou Balde** | [abddou.balde@sn.01talent.com](mailto:abddou.balde@sn.01talent.com) | [abdbalde](https://learn.zone01dakar.sn/git/abdbalde) |
+
+---
+
+## 📝 Notes et Améliorations Futures
+- [ ] Ajouter des tests unitaires avec Jest
+- [ ] Mettre en place un système de monitoring
+- [ ] Automatiser le déploiement avec Ansible ou Docker
+
+📌 **Dernier mot :** Ce projet est en constante évolution ! N'hésitez pas à contribuer et proposer des améliorations. 🚀
+
