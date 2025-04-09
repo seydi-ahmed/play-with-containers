@@ -34,7 +34,7 @@ inventory_app_path = vagrant_config['inventory_app_path']
 apigateway_app_path = vagrant_config['apigateway_app_path']
 
 Vagrant.configure("2") do |config|
-  config.env.enable
+  # config.env.enable
   config.vm.box = box
   config.ssh.forward_agent = true
 
@@ -97,11 +97,13 @@ Vagrant.configure("2") do |config|
       path: "scripts/run-py-server.sh",
       env: {
         "APP_PATH" => billing_app_path,
-        "BILL_DB_HOST" => "localhost",
+        # "BILL_DB_HOST" => "localhost",
+        "BILL_DB_HOST" => "BILLING_HOST",
         "BILLING_DB_USER" => BILLING_DB_USER,
         "BILLING_DB_PASSWORD" => BILLING_DB_PASSWORD,
         "BILLING_DB_NAME" => BILLING_DB_NAME,
-        "RABBITMQ_HOST" => "localhost",
+        # "RABBITMQ_HOST" => "localhost",
+        "RABBITMQ_HOST" => "BILLING_HOST",
         "RABBITMQ_PORT" => RABBITMQ_PORT,
         "RABBITMQ_USER" => RABBITMQ_USER,
         "RABBITMQ_PASSWORD" => RABBITMQ_PASSWORD,
@@ -146,7 +148,8 @@ Vagrant.configure("2") do |config|
         "INVENTORY_DB_USER" => INVENTORY_DB_USER,
         "INVENTORY_DB_PASSWORD" => INVENTORY_DB_PASSWORD,
         "INVENTORY_DB_NAME" => INVENTORY_DB_NAME,
-        "INVENTORY_DB_HOST" => "localhost",
+        # "INVENTORY_DB_HOST" => "localhost",
+        "INVENTORY_DB_HOST" => "POSTGRES_HOST",
       }
 
   end

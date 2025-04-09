@@ -1,32 +1,26 @@
-#!/bin/bash
+# play-with-containers/scripts/postgresql-setup.sh
 
-# install postgresql
+#!/bin/bash
+set -e  # Stop on error
+
+# Install PostgreSQL
 apt-get update && apt-get install -y postgresql-14 postgresql-contrib
 
-# stop postgresql
-/etc/init.d/postgresql stop
+# Configure remote access
+echo "listen_addresses='*'" >> /etc/postgresql/14/main/postgresql.conf
+echo "host all all 0.0.0.0/0 md5" >> /etc/postgresql/14/main/pg_hba.conf
 
-# Clear the DB to make it ready for setup
-rm -rf /var/lib/postgresql/14/main
+# Restart service
+systemctl restart postgresql
 
-# Init the database
-mkdir /var/lib/postgresql/14/main
-chown postgres:postgres /var/lib/postgresql/14/main
-cd /var/lib/postgresql/14/main
+# Create user/database if not exists
+if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}'" | grep -q 1; then
+    sudo -u postgres psql -c "CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}';"
+fi
 
-su -c '/usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main/' -s /bin/sh postgres
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw "${DB_NAME}"; then
+    sudo -u postgres psql -c "CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};"
+    sudo -u postgres psql -d ${DB_NAME} -c "GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${DB_USER};"
+fi
 
-# Enable public access
-echo "listen_addresses='*'" >> /var/lib/postgresql/14/main/postgresql.conf
-
-# Enable public access
-echo "host  all  all 0.0.0.0/0 md5" >> /var/lib/postgresql/14/main/pg_hba.conf
-
-# run postgresql server
-su -c 'nohup /usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main -l logfile start'
-
-/etc/init.d/postgresql start
-
-# setup the database
-sudo -u postgres -H -- psql -d postgres -c "CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}';"
-sudo -u postgres -H -- psql -d postgres -c "CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};"
+echo "PostgreSQL setup completed successfully."

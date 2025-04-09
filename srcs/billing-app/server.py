@@ -1,3 +1,5 @@
+# play-with-containers/srcs/billing-app/server.py
+
 from app.consume_queue import consume_and_store_order
 from app.orders import Base
 
@@ -14,7 +16,8 @@ if __name__ == "__main__":
     DB_URI = (
         "postgresql://"
         f'{BILLING_DB_USER}:{BILLING_DB_PASSWORD}'
-        f'@localhost:5432/{BILLING_DB_NAME}'
+        # f'@localhost:5432/{BILLING_DB_NAME}'
+        f'@{BILLING_HOST}:5432/{BILLING_DB_NAME}'
     )
 
     engine = create_engine(DB_URI)

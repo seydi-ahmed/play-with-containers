@@ -1,3 +1,4 @@
+# play-with-containers/srcs/inventory-app/app/__init__.py.py
 from flask import Flask
 import os
 
@@ -7,7 +8,8 @@ from app.movies import bp as bp_movies
 DB_URI = (
     "postgresql://"
     f'{os.getenv("INVENTORY_DB_USER")}:{os.getenv("INVENTORY_DB_PASSWORD")}'
-    f'@localhost:5432/{os.getenv("INVENTORY_DB_NAME")}'
+    # f'@localhost:5432/{os.getenv("INVENTORY_DB_NAME")}'
+    f'@("POSTGRES_HOST"):5432/{os.getenv("INVENTORY_DB_NAME")}'
 )
 
 

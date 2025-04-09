@@ -1,14 +1,26 @@
+# play-with-containers/scripts/rabbitmq-setup.sh
+
 #!/bin/bash
+set -e  # Stop on error
 
-# install rabbitmq
-apt-get update && \
-    apt-get install -y rabbitmq-server && \
-    rabbitmq-plugins enable rabbitmq_management
+# Install RabbitMQ
+apt-get update && apt-get install -y rabbitmq-server
+rabbitmq-plugins enable rabbitmq_management
+systemctl start rabbitmq-server
 
-# start rabbitmq server
-/etc/init.d/rabbitmq-server start
+# Create admin user if not exists
+if ! rabbitmqctl list_users | grep -q "${RABBITMQ_USER}"; then
+    rabbitmqctl add_user "${RABBITMQ_USER}" "${RABBITMQ_PASSWORD}"
+    rabbitmqctl set_user_tags "${RABBITMQ_USER}" administrator
+    rabbitmqctl set_permissions -p / "${RABBITMQ_USER}" ".*" ".*" ".*"
+    echo "User ${RABBITMQ_USER} created."
+else
+    echo "User ${RABBITMQ_USER} already exists - updating password."
+    rabbitmqctl change_password "${RABBITMQ_USER}" "${RABBITMQ_PASSWORD}"
+fi
 
-# create the rabbitmq user
-rabbitmqctl add_user ${RABBITMQ_USER} ${RABBITMQ_PASSWORD} || echo ${RABBITMQ_USER} already exists 
-rabbitmqctl set_user_tags ${RABBITMQ_USER} administrator
-rabbitmqctl set_permissions -p / ${RABBITMQ_USER} ".*" ".*" ".*"
+# Enable management UI
+rabbitmq-plugins enable rabbitmq_management
+systemctl restart rabbitmq-server
+
+echo "RabbitMQ setup completed successfully."
