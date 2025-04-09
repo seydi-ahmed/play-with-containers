@@ -28,9 +28,6 @@ docker stop $(docker ps -aq)
 # suppriemr tous les conteneurs
 docker rm -f $(docker ps -aq)
 
-# supprimer toutes les images
-docker rmi $(docker images -q)
-
 # suppriemr les volumes
 docker volume prune
 
@@ -49,3 +46,14 @@ docker inspect -f "{{ .HostConfig.RestartPolicy }}" inventory-app
 docker inspect -f "{{ .HostConfig.RestartPolicy }}" inventory-db
 docker inspect -f "{{ .HostConfig.RestartPolicy }}" billing-db
 docker inspect -f "{{ .HostConfig.RestartPolicy }}" rabbitmq
+
+
+Vous avez dit :
+docker exec -it inventory-db psql -U postgres -d movies
+
+CREATE TABLE movies (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
