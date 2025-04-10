@@ -29,15 +29,14 @@ services:
     build: ./srcs/inventory-app
     container_name: inventory-app
     ports:
-      # - "${INVENTORY_PORT}:8080"
-      - "8081:8080"
+      # - "8081:8080"
+      - "${INVENTORY_HOST}:${INVENTORY_BILLING_PORT}"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB_MOVIES: ${POSTGRES_DB_MOVIES}
       POSTGRES_HOST: inventory-db
-      # INVENTORY_PORT: ${INVENTORY_PORT}
-      INVENTORY_PORT: 8080
+      INVENTORY_PORT: ${INVENTORY_BILLING_PORT}
     depends_on:
       inventory-db:
         condition: service_healthy
@@ -52,14 +51,13 @@ services:
     build: ./srcs/api-gateway
     container_name: api-gateway
     ports:
-      - "${GATEWAY_PORT}:3000"
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
     environment:
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       RABBITMQ_QUEUE: ${RABBITMQ_QUEUE}
       INVENTORY_API_URL: http://inventory-app
-      INVENTORY_PORT: 8080
-      # BILLING_API_URL: billing-app
+      INVENTORY_PORT: ${INVENTORY_BILLING_PORT}
       BILLING_API_URL: http://billing-app:7070
       GATEWAY_PORT: ${GATEWAY_PORT}
     volumes:
@@ -80,13 +78,12 @@ services:
     build: ./srcs/billing-app
     container_name: billing-app
     ports:
-      # - "${BILLING_PORT}:7070"
-      - "8082:8080"
+      - "${BILLING_HOST}:${INVENTORY_BILLING_PORT}"
     environment:
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       RABBITMQ_HOST: rabbitmq
-      BILLING_PORT: 8080
+      BILLING_PORT: ${INVENTORY_BILLING_PORT}"
       POSTGRES_HOST: billing-db
     networks:
       - backend
@@ -107,7 +104,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB_ORDERS}
     ports:
-      - "5434:5432"
+      - "${BILLING_DB_ONE}:${BILLING_DB_TWO}"
     volumes:
       - billing-database:/var/lib/postgresql/data
     networks:
@@ -123,8 +120,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${RABBITMQ_DOCK_ONE}:${RABBITMQ_DOCK_TWO}"
+      - "${RABBITMQ_DOCK_THREE}:${RABBITMQ_DOCK_FOUR}"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}

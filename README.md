@@ -76,10 +76,34 @@ Assurez-vous que vous avez installé Docker et Docker Compose sur votre machine.
     docker restart <container_name>
     ```
 
+- **Arrêter un container spécifique :**
+
+    ```bash
+    docker stop <container_name>
+    ```
+
 - **Arrêter tous les containers :**
 
     ```bash
     docker-compose down
+    ```
+
+- **Supprimer tous les conteneurs :**
+
+    ```bash
+    docker rm -f $(docker ps -aq)
+    ```
+
+- **Supprimer toutes les images :**
+
+    ```bash
+    docker rmi -f $(docker images -q)
+    ```
+
+- **Supprimer tous les volumes :**
+
+    ```bash
+    docker volume rm $(docker volume ls -q)
     ```
 
 ---
