@@ -10,14 +10,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    # image: postgres:15-alpine
+    # image: postgres8082:15-alpine
     container_name: inventory-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB_MOVIES}
-    ports:
-      - "${INVENTORY_DB_HOST_DOCK}:${INVENTORY_DB_LCOAL_DOCK}"
+    expose:
+      - "${INVENTORY_DB_LCOAL_DOCK}"
     volumes:
       - inventory-database:/var/lib/postgresql/data
     networks:
@@ -28,8 +28,8 @@ services:
     image: inventory-app
     build: ./srcs/inventory-app
     container_name: inventory-app
-    ports:
-      - "${INVENTORY_HOST}:${INVENTORY_BILLING_PORT}"
+    expose:
+      - "${INVENTORY_BILLING_PORT}"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -76,8 +76,8 @@ services:
         condition: service_healthy
     build: ./srcs/billing-app
     container_name: billing-app
-    ports:
-      - "${BILLING_HOST}:${INVENTORY_BILLING_PORT}"
+    expose:
+      - "${INVENTORY_BILLING_PORT}"
     environment:
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
@@ -102,8 +102,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB_ORDERS}
-    ports:
-      - "${BILLING_DB_ONE}:${BILLING_DB_TWO}"
+    expose:
+      - "${BILLING_DB_TWO}"
     volumes:
       - billing-database:/var/lib/postgresql/data
     networks:
@@ -119,8 +119,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "${RABBITMQ_DOCK_ONE}:${RABBITMQ_DOCK_TWO}"
-      - "${RABBITMQ_DOCK_THREE}:${RABBITMQ_DOCK_FOUR}"
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+      - "${RABBITMQ_WEB}:${RABBITMQ_WEB}"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
