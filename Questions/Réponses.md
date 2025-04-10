@@ -40,13 +40,13 @@ Un volume Docker est un mécanisme pour persister les données indépendamment d
 Pour persister les données même après l'arrêt ou la suppression des containers, et pour partager des données entre containers.
 
 ## 12. Qu'est-ce qu'un réseau Docker ?
-Un réseau Docker permet aux containers de communiquer entre eux. Docker fournit des réseaux par défaut, mais tu peux aussi en créer de personnalisés.
+Un réseau Docker est un gestionnaire qui permet la connexion entre conteneurs.
 
 ## 13. Pourquoi utilisons-nous le réseau Docker ?
 Pour permettre la communication sécurisée entre les containers et isoler leur trafic réseau, tout en facilitant la gestion des connexions.
 
 ## 14. Qu'est-ce qu'une image Docker ?
-Une image Docker est un modèle en lecture seule à partir duquel les containers sont créés. Elle contient tout le nécessaire pour exécuter une application.
+Une image Docker est un modèle qui contient tout le nécessaire pour exécuter une application.
 
 ## 15. Pourquoi utilisons-nous les images Docker ?
 Les images Docker permettent de créer des containers reproductibles et portables, facilitant le déploiement d'applications dans n'importe quel environnement.
