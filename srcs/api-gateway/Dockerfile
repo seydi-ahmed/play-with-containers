@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Démarrer le serveur
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

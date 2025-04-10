@@ -1,18 +1,12 @@
-# Use the penultimate stable Alpine-based Node.js image (v18)
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app
 COPY . .
 
-# Expose the port
 EXPOSE 8080
 
-# Start the app
-CMD ["node", "server.js"]
+CMD ["npm", "start"]

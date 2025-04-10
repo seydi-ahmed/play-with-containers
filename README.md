@@ -6,13 +6,6 @@
 
 Ce projet remplace les VM initialement gérées avec Vagrant par des containers Docker, offrant ainsi une gestion plus simple et plus rapide des différents services.
 
-## Auteur
-
-- **Nom** : Mouhamed DIOUF
-- **GitHub** : [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf)
-- **Email** : seydiahmedelcheikh@gmail.com
-
----
 
 ## Prérequis
 
@@ -41,7 +34,7 @@ Assurez-vous que vous avez installé Docker et Docker Compose sur votre machine.
 3. **Lancez les containers avec Docker Compose :**
 
     ```bash
-    docker-compose up -d
+    docker-compose up --build
     ```
 
     Cela va démarrer tous les services dans des containers Docker (API Gateway, Billing App, Inventory App, RabbitMQ, PostgreSQL).
@@ -54,22 +47,27 @@ Assurez-vous que vous avez installé Docker et Docker Compose sur votre machine.
     docker ps
     ```
 
-- **Afficher les logs d'un container :**
+- **Vérifier la politique de redémarrage :**
 
     ```bash
-    docker logs -f <container_name>
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" api-gateway
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" billing-app
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" inventory-app
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" inventory-db
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" billing-db
+    docker inspect -f "{{ .HostConfig.RestartPolicy }}" rabbitmq
     ```
 
-- **Arrêter un container spécifique :**
+- **Lister tous les volumes présents sur le systéme :**
 
     ```bash
-    docker stop <container_name>
+    docker volume ls
     ```
 
-- **Démarrer un container spécifique :**
+- **Lister les images docker présents sur le systéme :**
 
     ```bash
-    docker start <container_name>
+    docker images
     ```
 
 - **Redémarrer un container spécifique :**
@@ -162,7 +160,10 @@ Si vous rencontrez des problèmes avec l'une des étapes ci-dessus, voici quelqu
 
 ---
 
-## Licence
+## Auteur
 
-Ce projet est sous **licence MIT**.
+- **Nom** : Mouhamed DIOUF
+- **GitHub** : [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf)
+- **Email** : seydiahmedelcheikh@gmail.com
 
+---
