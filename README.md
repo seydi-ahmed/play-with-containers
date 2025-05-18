@@ -1,5 +1,8 @@
 # play-with-containers
 
+## Projet
+le lien vers le projet est: https://github.com/01-edu/public/tree/master/subjects/devops/play-with-containers.
+
 ## Description
 
 **play-with-containers** est un projet Dockerisé qui utilise plusieurs services (API Gateway, Inventory, Billing) pour simuler une application full-stack avec une gestion des requêtes via RabbitMQ et un proxy avec Nginx. Ce projet est conçu pour gérer les informations de facturation et d'inventaire tout en testant l'architecture des containers Docker.
