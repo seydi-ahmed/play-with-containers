@@ -190,7 +190,8 @@ Si vous rencontrez des problèmes avec l'une des étapes ci-dessus, voici quelqu
 ## Auteur
 
 - **Nom** : Mouhamed DIOUF
-- **GitHub** : [mouhameddiouf](https://learn.zone01dakar.sn/git/mouhameddiouf)
+- **GitHub** : [mouhameddiouf](https://github.com/seydi-ahmed)
 - **Email** : seydiahmedelcheikh@gmail.com
+- **Numéro** : +221776221681
 
 ---
