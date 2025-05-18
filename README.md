@@ -193,5 +193,6 @@ Si vous rencontrez des problèmes avec l'une des étapes ci-dessus, voici quelqu
 - **GitHub** : [mouhameddiouf](https://github.com/seydi-ahmed)
 - **Email** : seydiahmedelcheikh@gmail.com
 - **Numéro** : +221776221681
+- **Réseaux** : [LinkedIn](www.linkedin.com/in/mouhamed-diouf-435207174)
 
 ---
